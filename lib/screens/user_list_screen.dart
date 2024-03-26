@@ -23,7 +23,7 @@ class _UserListScreenState extends State<UserListScreen> {
       name: 'Yash Wadatkar',
       email: 'yash.wadatkar@coditas.com',
       phone: '8888888888',
-      address: 'Nyati, Pune',
+      address: 'Wardha',
       avatar: '',
     ),
     User(
@@ -37,14 +37,14 @@ class _UserListScreenState extends State<UserListScreen> {
       name: 'Gaurav Wani',
       email: 'gaurav.wani@coditas.com',
       phone: '7777777777',
-      address: 'Nyati, Pune',
+      address: 'Jalgoan',
       avatar: '',
     ),
     User(
       name: 'Siddhant Nilange',
       email: 'siddhant.nilange@coditas.com',
       phone: '6666666666',
-      address: 'Pune',
+      address: 'Parbhani',
       avatar: '',
     ),
   ];
@@ -100,9 +100,33 @@ class _UserListScreenState extends State<UserListScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
-                      setState(() {
-                        users.removeAt(index);
-                      });
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirm Deletion'),
+                            content: const Text(
+                                'Are you sure you want to delete this user?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    users.removeAt(index);
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
 

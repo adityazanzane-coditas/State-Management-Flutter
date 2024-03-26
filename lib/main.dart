@@ -10,10 +10,9 @@ class UserApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'User Details',
-      theme: ThemeData(primaryColor: Colors.amber),
-      home: const UserListScreen(),
+      home: UserListScreen(),
     );
   }
 }

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/data/user_data.dart';
+import 'package:user_app/data/user_edit_data.dart';
 
 class UserEditScreen extends StatefulWidget {
   const UserEditScreen({
     super.key,
-    required this.user,
-    required this.avatarPath,
+    required this.userEditData,
   });
 
-  final User user; // hold edited user-data in screen
-  final String avatarPath; //to reflect same avatar in screen
+  final UserEditData userEditData;
 
   @override
   _UserEditScreenState createState() => _UserEditScreenState();
@@ -28,10 +27,11 @@ class _UserEditScreenState extends State<UserEditScreen> {
   // Initialization Logic
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user.name);
-    _emailController = TextEditingController(text: widget.user.email);
-    _phoneController = TextEditingController(text: widget.user.phone);
-    _addressController = TextEditingController(text: widget.user.address);
+    _nameController = TextEditingController(text: widget.userEditData.name);
+    _emailController = TextEditingController(text: widget.userEditData.email);
+    _phoneController = TextEditingController(text: widget.userEditData.phone);
+    _addressController =
+        TextEditingController(text: widget.userEditData.address);
   }
 
   @override

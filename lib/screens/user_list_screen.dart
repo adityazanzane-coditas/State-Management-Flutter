@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:user_app/data/user_data.dart';
-import 'package:user_app/providers/user_provider.dart';
+import 'package:user_app/state/user_riverpod.dart';
 import 'package:user_app/screens/edit_user_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:user_app/data/user_edit_data.dart';
 
-class UserListScreen extends StatelessWidget {
+class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
 
   String getAvatarPath(User user, List<String> avatarOptions, int index) {
@@ -15,10 +15,8 @@ class UserListScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    //Provider
-    final userProvider = Provider.of<UserProvider>(context);
-    final List<User> users = userProvider.users;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userRiverpod);
 
     final List<String> avatarOptions = [
       'assets/lion_avatar.png',
@@ -99,7 +97,9 @@ class UserListScreen extends StatelessWidget {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      userProvider.deleteUser(index);
+                                      ref
+                                          .read(userRiverpod.notifier)
+                                          .deleteUser(index);
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('Delete'),
@@ -123,7 +123,9 @@ class UserListScreen extends StatelessWidget {
                           ),
                         ).then((updatedUser) {
                           if (updatedUser != null) {
-                            userProvider.updateUser(index, updatedUser);
+                            ref
+                                .read(userRiverpod.notifier)
+                                .updateUser(index, updatedUser);
                           }
                         });
                       },
@@ -160,7 +162,7 @@ class UserListScreen extends StatelessWidget {
             ),
           ).then((newUser) {
             if (newUser != null) {
-              userProvider.addUser(newUser);
+              ref.read(userRiverpod.notifier).addUser(newUser);
             }
           });
         },

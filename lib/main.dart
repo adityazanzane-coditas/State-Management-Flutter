@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:user_app/providers/user_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:user_app/screens/user_list_screen.dart';
 
 void main() {
-  runApp(const UserApp());
+  runApp(const ProviderScope(child: UserApp()));
 }
 
 class UserApp extends StatelessWidget {
@@ -12,12 +11,9 @@ class UserApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => UserProvider(),
-      child: const MaterialApp(
-        title: 'User Details',
-        home: UserListScreen(),
-      ),
+    return const MaterialApp(
+      title: 'User Details',
+      home: UserListScreen(),
     );
   }
 }

@@ -11,6 +11,7 @@ class UserEditScreen extends StatefulWidget {
   final UserEditData userEditData;
 
   @override
+  // ignore: library_private_types_in_public_api
   _UserEditScreenState createState() => _UserEditScreenState();
 }
 

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/data/user_data.dart';
-import 'package:user_app/data/user_edit_data.dart';
 
 class UserEditScreen extends StatefulWidget {
   const UserEditScreen({
     super.key,
-    required this.userEditData,
+    required this.user,
+    required this.avatarPath,
   });
 
-  final UserEditData userEditData;
+  final User user; // hold edited user-data in screen
+  final String avatarPath; // to reflect the same avatar on the screen
 
   @override
   _UserEditScreenState createState() => _UserEditScreenState();
@@ -25,11 +26,10 @@ class _UserEditScreenState extends State<UserEditScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.userEditData.name);
-    _emailController = TextEditingController(text: widget.userEditData.email);
-    _phoneController = TextEditingController(text: widget.userEditData.phone);
-    _addressController =
-        TextEditingController(text: widget.userEditData.address);
+    _nameController = TextEditingController(text: widget.user.name);
+    _emailController = TextEditingController(text: widget.user.email);
+    _phoneController = TextEditingController(text: widget.user.phone);
+    _addressController = TextEditingController(text: widget.user.address);
   }
 
   @override
@@ -85,7 +85,9 @@ class _UserEditScreenState extends State<UserEditScreen> {
               children: [
                 CircleAvatar(
                   radius: 83,
-                  backgroundImage: AssetImage(widget.userEditData.avatarPath),
+                  backgroundImage: widget.user.avatar.isNotEmpty
+                      ? AssetImage(widget.user.avatar)
+                      : AssetImage(widget.avatarPath),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -159,7 +161,7 @@ class _UserEditScreenState extends State<UserEditScreen> {
                             email: _emailController.text,
                             phone: _phoneController.text,
                             address: _addressController.text,
-                            avatar: widget.userEditData.avatarPath,
+                            avatar: widget.user.avatar,
                           );
                           Navigator.pop(context, updatedUser);
                         }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/data/user_data.dart';
-import 'package:user_app/data/user_edit_data.dart';
 import 'package:user_app/providers/user_provider.dart';
 import 'package:user_app/screens/edit_user_screen.dart';
 import 'package:provider/provider.dart';
@@ -8,16 +7,9 @@ import 'package:provider/provider.dart';
 class UserListScreen extends StatelessWidget {
   const UserListScreen({super.key});
 
-  String getAvatarPath(User user, List<String> avatarOptions, int index) {
-    return user.avatar.isNotEmpty
-        ? user.avatar
-        : avatarOptions[index % avatarOptions.length];
-  }
-
   @override
   Widget build(BuildContext context) {
     //Provider
-
     final userProvider = Provider.of<UserProvider>(context);
     final List<User> users = userProvider.users;
 
@@ -116,10 +108,10 @@ class UserListScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => UserEditScreen(
-                              userEditData: UserEditData.fromUser(
-                                user,
-                                getAvatarPath(user, avatarOptions, index),
-                              ),
+                              user: user,
+                              avatarPath: user.avatar.isNotEmpty
+                                  ? user.avatar
+                                  : avatarOptions[index % avatarOptions.length],
                             ),
                           ),
                         ).then((updatedUser) {
@@ -140,23 +132,14 @@ class UserListScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => UserEditScreen(
-                userEditData: UserEditData(
+                user: User(
                   name: '',
                   email: '',
                   phone: '',
                   address: '',
-                  avatarPath: getAvatarPath(
-                    User(
-                      name: '',
-                      email: '',
-                      phone: '',
-                      address: '',
-                      avatar: '',
-                    ),
-                    avatarOptions,
-                    0,
-                  ),
+                  avatar: '',
                 ),
+                avatarPath: 'assets/profile_icon.png',
               ),
             ),
           ).then((newUser) {

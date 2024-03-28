@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:user_app/screens/user_list_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const UserApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class UserApp extends StatelessWidget {
+  const UserApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'User Details',
+      home: UserListScreen(),
+    );
   }
+}

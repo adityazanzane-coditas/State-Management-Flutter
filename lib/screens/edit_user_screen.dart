@@ -9,23 +9,21 @@ class UserEditScreen extends StatefulWidget {
   });
 
   final User user; // hold edited user-data in screen
-  final String avatarPath; //to reflect same avatar in screen
+  final String avatarPath; // to reflect the same avatar on the screen
 
   @override
   _UserEditScreenState createState() => _UserEditScreenState();
 }
 
 class _UserEditScreenState extends State<UserEditScreen> {
-  // Updating Ui of TextField
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Form key
+  final _formKey = GlobalKey<FormState>(); // Key for the form
 
   @override
-  // Initialization Logic
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.user.name);
@@ -35,7 +33,6 @@ class _UserEditScreenState extends State<UserEditScreen> {
   }
 
   @override
-  // Removing State Object no longer needed
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -44,82 +41,101 @@ class _UserEditScreenState extends State<UserEditScreen> {
     super.dispose();
   }
 
+  // Custom validation methods
+  String? validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your name';
+    }
+    return null;
+  }
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    } else if (!RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$")
+        .hasMatch(value)) {
+      return 'Please enter a valid email address (e.g., example@gmail.com)';
+    }
+    return null;
+  }
+
+  String? validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your phone number';
+    } else if (!RegExp(r"^\d{10}$").hasMatch(value)) {
+      return 'Please enter a valid 10-digit phone number';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit User Details'),
+        backgroundColor: Colors.grey,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Form(
-            // Wrap with Form widget
-
-            key: _formKey, // Assign the key
-            autovalidateMode: AutovalidateMode.always, // Enable auto-validation
-
+            key: _formKey, // Set the form key
             child: Column(
               children: [
-                // Field to enter the values
                 CircleAvatar(
                   radius: 83,
                   backgroundImage: widget.user.avatar.isNotEmpty
                       ? AssetImage(widget.user.avatar)
-                      : AssetImage(
-                          widget.avatarPath), // Default avatar image path
+                      : AssetImage(widget.avatarPath),
                 ),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(38),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    return null;
-                  },
+                  validator: validateName, // Validation method name
                 ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(38),
+                    ),
                   ),
+
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    } else if (!RegExp(
-                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$")
-                        .hasMatch(value)) {
-                      return 'Please enter a valid email address (e.g., example@gmail.com)';
-                    }
-                    return null;
-                  },
+                  validator: validateEmail, // Validation method email
                 ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone',
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(38),
+                    ),
                   ),
                   keyboardType: TextInputType.phone,
-                  maxLength: 10, // Limit to 10 digits
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    } else if (!RegExp(r"^\d{10}$").hasMatch(value)) {
-                      return 'Please enter a valid 10-digit phone number';
-                    }
-                    return null;
-                  },
+                  maxLength: 10,
+                  validator: validatePhone, // Validation method phone
                 ),
+                const SizedBox(height: 4),
                 TextFormField(
                   controller: _addressController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Address',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(38),
+                    ),
                   ),
-                  maxLength: 50, // Limit to 50 words
+                  maxLength: 50,
                 ),
                 const SizedBox(height: 16.0),
                 Row(
@@ -129,12 +145,17 @@ class _UserEditScreenState extends State<UserEditScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text('Cancel'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        // Validate the form before saving
                         if (_formKey.currentState!.validate()) {
-                          // Validate the form
                           final updatedUser = User(
                             name: _nameController.text,
                             email: _emailController.text,
@@ -142,11 +163,15 @@ class _UserEditScreenState extends State<UserEditScreen> {
                             address: _addressController.text,
                             avatar: widget.user.avatar,
                           );
-                          //Pop with updated list
                           Navigator.pop(context, updatedUser);
                         }
                       },
-                      child: const Text('Save'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey),
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ],
                 ),

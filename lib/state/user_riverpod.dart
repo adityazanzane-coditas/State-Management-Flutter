@@ -45,7 +45,7 @@ class UserProvider extends StateNotifier<List<User>> {
         ]);
 
   void addUser(User newUser) {
-    state = [...state, newUser];
+    state.add(newUser);
   }
 
   void updateUser(int index, User updatedUser) {

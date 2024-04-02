@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:user_app/data/user_data.dart';
+import 'package:user_app/screens/add_user_screen.dart';
 import 'package:user_app/state/user_riverpod.dart';
 import 'package:user_app/screens/edit_user_screen.dart';
-import 'package:user_app/data/user_edit_data.dart';
 
 class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
@@ -61,11 +61,10 @@ class UserListScreen extends ConsumerWidget {
                     margin:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(16), // Rounded corners
+                      borderRadius: BorderRadius.circular(16),
                       side: const BorderSide(
-                        color: Colors.grey, // Custom border color
-                        width: 2, // Custom border width
+                        color: Colors.grey,
+                        width: 2,
                       ),
                     ),
                     child: ListTile(
@@ -115,11 +114,12 @@ class UserListScreen extends ConsumerWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => UserEditScreen(
-                              userEditData: UserEditData.fromUser(
-                                user,
-                                getAvatarPath(user, avatarOptions, index),
-                              ),
-                            ),
+                                name: user.name,
+                                address: user.address,
+                                phoneNumber: user.phone,
+                                email: user.email,
+                                avatar:
+                                    getAvatarPath(user, avatarOptions, index)),
                           ),
                         ).then((updatedUser) {
                           if (updatedUser != null) {
@@ -140,25 +140,7 @@ class UserListScreen extends ConsumerWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserEditScreen(
-                userEditData: UserEditData(
-                  name: '',
-                  email: '',
-                  phone: '',
-                  address: '',
-                  avatarPath: getAvatarPath(
-                    User(
-                      name: '',
-                      email: '',
-                      phone: '',
-                      address: '',
-                      avatar: '',
-                    ),
-                    avatarOptions,
-                    0,
-                  ),
-                ),
-              ),
+              builder: (context) => const AddUserScreen(),
             ),
           ).then((newUser) {
             if (newUser != null) {

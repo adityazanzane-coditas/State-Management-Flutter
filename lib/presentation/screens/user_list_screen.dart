@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:user_app/data/user_data.dart';
-import 'package:user_app/screens/add_user_screen.dart';
-import 'package:user_app/state/user_riverpod.dart';
-import 'package:user_app/screens/edit_user_screen.dart';
+import 'package:user_app/data/models/user.dart';
+import 'package:user_app/presentation/providers/user_list_provider.dart';
+import 'package:user_app/presentation/screens/add_user_screen.dart';
+import 'package:user_app/presentation/screens/edit_user_screen.dart';
+import 'package:user_app/core/constants.dart';
 
 class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
@@ -16,21 +17,9 @@ class UserListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final users = ref.watch(userRiverpod);
+    final users = ref.watch(userListProvider);
 
-    final List<String> avatarOptions = [
-      'assets/lion_avatar.png',
-      'assets/shark_avatar.png',
-      'assets/skull_avatar.png',
-      'assets/tiger_avatar.png',
-      'assets/cow_avatar.png',
-      'assets/giraffe_avatar.png',
-      'assets/mouse_avatar.png',
-      'assets/octopus_avatar.png',
-      'assets/owl_avatar.png',
-      'assets/robot_avatar.png',
-      'assets/pig_avatar.png',
-    ];
+    const List<String> avatarOptions = Constants.avatarOptions;
 
     return Scaffold(
       appBar: AppBar(
@@ -97,7 +86,7 @@ class UserListScreen extends ConsumerWidget {
                                   TextButton(
                                     onPressed: () {
                                       ref
-                                          .read(userRiverpod.notifier)
+                                          .read(userListProvider.notifier)
                                           .deleteUser(index);
                                       Navigator.of(context).pop();
                                     },
@@ -124,7 +113,7 @@ class UserListScreen extends ConsumerWidget {
                         ).then((updatedUser) {
                           if (updatedUser != null) {
                             ref
-                                .read(userRiverpod.notifier)
+                                .read(userListProvider.notifier)
                                 .updateUser(index, updatedUser);
                           }
                         });
@@ -144,7 +133,7 @@ class UserListScreen extends ConsumerWidget {
             ),
           ).then((newUser) {
             if (newUser != null) {
-              ref.read(userRiverpod.notifier).addUser(newUser);
+              ref.read(userListProvider.notifier).addUser(newUser);
             }
           });
         },

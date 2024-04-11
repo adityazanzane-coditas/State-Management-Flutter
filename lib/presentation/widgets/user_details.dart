@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:user_app/data/user_data.dart';
+import 'package:user_app/data/models/user.dart';
+import 'package:user_app/utils/validators.dart';
 
 class UserDetails extends StatelessWidget {
   UserDetails({
@@ -14,33 +15,6 @@ class UserDetails extends StatelessWidget {
   final String name, email, phoneNumber, address, avatar;
 
   final _formKey = GlobalKey<FormState>();
-
-  String? validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your name';
-    }
-    return null;
-  }
-
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    } else if (!RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$")
-        .hasMatch(value)) {
-      return 'Please enter a valid email address (e.g., example@gmail.com)';
-    }
-    return null;
-  }
-
-  String? validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your phone number';
-    } else if (!RegExp(r"^\d{10}$").hasMatch(value)) {
-      return 'Please enter a valid 10-digit phone number';
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +44,7 @@ class UserDetails extends StatelessWidget {
                 borderRadius: BorderRadius.circular(38),
               ),
             ),
-            validator: validateName,
+            validator: Validators.validateName,
           ),
           const SizedBox(height: 16),
           TextFormField(
@@ -82,7 +56,7 @@ class UserDetails extends StatelessWidget {
               ),
             ),
             keyboardType: TextInputType.emailAddress,
-            validator: validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           TextFormField(
@@ -95,7 +69,7 @@ class UserDetails extends StatelessWidget {
             ),
             keyboardType: TextInputType.phone,
             maxLength: 10,
-            validator: validatePhone,
+            validator: Validators.validatePhone,
           ),
           const SizedBox(height: 5),
           TextFormField(

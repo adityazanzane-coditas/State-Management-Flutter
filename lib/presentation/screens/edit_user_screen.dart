@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:user_app/user_details.dart';
+import '../widgets/user_details.dart';
 
 class UserEditScreen extends StatelessWidget {
   const UserEditScreen({

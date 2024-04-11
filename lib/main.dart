@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:user_app/screens/user_list_screen.dart';
+import 'package:user_app/presentation/screens/user_list_screen.dart';
 
 void main() {
-  runApp(const ProviderScope(child: UserApp()));
+  runApp(
+    const ProviderScope(
+      child: UserApp(),
+    ),
+  );
 }
 
 class UserApp extends StatelessWidget {
@@ -14,6 +18,7 @@ class UserApp extends StatelessWidget {
     return const MaterialApp(
       title: 'User Details',
       home: UserListScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

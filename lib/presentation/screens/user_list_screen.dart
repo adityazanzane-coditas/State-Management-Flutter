@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:user_app/data/user_data.dart';
-import 'package:user_app/providers/user_provider.dart';
-import 'package:user_app/screens/edit_user_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:user_app/data/user_edit_data.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:user_app/data/models/user.dart';
+import 'package:user_app/presentation/providers/user_list_provider.dart';
+import 'package:user_app/presentation/screens/add_user_screen.dart';
+import 'package:user_app/presentation/screens/edit_user_screen.dart';
+import 'package:user_app/core/constants.dart';
 
-class UserListScreen extends StatelessWidget {
+class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
 
   String getAvatarPath(User user, List<String> avatarOptions, int index) {
@@ -15,24 +16,10 @@ class UserListScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    //Provider
-    final userProvider = Provider.of<UserProvider>(context);
-    final List<User> users = userProvider.users;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userListProvider);
 
-    final List<String> avatarOptions = [
-      'assets/lion_avatar.png',
-      'assets/shark_avatar.png',
-      'assets/skull_avatar.png',
-      'assets/tiger_avatar.png',
-      'assets/cow_avatar.png',
-      'assets/giraffe_avatar.png',
-      'assets/mouse_avatar.png',
-      'assets/octopus_avatar.png',
-      'assets/owl_avatar.png',
-      'assets/robot_avatar.png',
-      'assets/pig_avatar.png',
-    ];
+    const List<String> avatarOptions = Constants.avatarOptions;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,11 +50,10 @@ class UserListScreen extends StatelessWidget {
                     margin:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(16), // Rounded corners
+                      borderRadius: BorderRadius.circular(16),
                       side: const BorderSide(
-                        color: Colors.grey, // Custom border color
-                        width: 2, // Custom border width
+                        color: Colors.grey,
+                        width: 2,
                       ),
                     ),
                     child: ListTile(
@@ -99,7 +85,9 @@ class UserListScreen extends StatelessWidget {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      userProvider.deleteUser(index);
+                                      ref
+                                          .read(userListProvider.notifier)
+                                          .deleteUser(index);
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('Delete'),
@@ -115,15 +103,18 @@ class UserListScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => UserEditScreen(
-                              userEditData: UserEditData.fromUser(
-                                user,
-                                getAvatarPath(user, avatarOptions, index),
-                              ),
-                            ),
+                                name: user.name,
+                                address: user.address,
+                                phoneNumber: user.phone,
+                                email: user.email,
+                                avatar:
+                                    getAvatarPath(user, avatarOptions, index)),
                           ),
                         ).then((updatedUser) {
                           if (updatedUser != null) {
-                            userProvider.updateUser(index, updatedUser);
+                            ref
+                                .read(userListProvider.notifier)
+                                .updateUser(index, updatedUser);
                           }
                         });
                       },
@@ -138,29 +129,11 @@ class UserListScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserEditScreen(
-                userEditData: UserEditData(
-                  name: '',
-                  email: '',
-                  phone: '',
-                  address: '',
-                  avatarPath: getAvatarPath(
-                    User(
-                      name: '',
-                      email: '',
-                      phone: '',
-                      address: '',
-                      avatar: '',
-                    ),
-                    avatarOptions,
-                    0,
-                  ),
-                ),
-              ),
+              builder: (context) => const AddUserScreen(),
             ),
           ).then((newUser) {
             if (newUser != null) {
-              userProvider.addUser(newUser);
+              ref.read(userListProvider.notifier).addUser(newUser);
             }
           });
         },

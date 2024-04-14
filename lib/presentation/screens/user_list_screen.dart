@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:user_app/data/models/user.dart';
-import 'package:user_app/presentation/providers/user_list_provider.dart';
-import 'package:user_app/presentation/screens/add_user_screen.dart';
-import 'package:user_app/presentation/screens/edit_user_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_app/core/constants.dart';
+import 'package:user_app/data/models/user.dart';
+import 'package:user_app/data/models/user_repository.dart';
+import 'package:user_app/presentation/bloc/user_event.dart';
+import 'package:user_app/presentation/bloc/user_list_bloc.dart';
+import 'package:user_app/presentation/bloc/user_states.dart';
+import 'package:user_app/presentation/screens/add_user_screen.dart';
+import 'package:user_app/presentation/widgets/user_card.dart';
 
-class UserListScreen extends ConsumerWidget {
+class UserListScreen extends StatelessWidget {
   const UserListScreen({super.key});
 
   String getAvatarPath(User user, List<String> avatarOptions, int index) {
@@ -16,128 +19,101 @@ class UserListScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final users = ref.watch(userListProvider);
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => UserListBloc(userRepository: UserRepository()),
+      child: BlocBuilder<UserListBloc, UserState>(
+        builder: (context, state) {
+          final userBloc = BlocProvider.of<UserListBloc>(context);
 
-    const List<String> avatarOptions = Constants.avatarOptions;
+          if (state is UserListLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is UserListLoaded) {
+            final List<User> users = state.userList;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'User List',
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: Colors.grey,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: users.isEmpty
-            ? const Center(
-                child: Text(
-                  'No users added yet!',
-                  style: TextStyle(fontSize: 20.0),
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text(
+                  'User List',
+                  style: TextStyle(fontWeight: FontWeight.w500),
                 ),
-              )
-            : ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (context, index) {
-                  //User Indexes
-                  final user = users[index];
+                backgroundColor: Colors.grey,
+              ),
+              body: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: users.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No users added yet!',
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
 
-                  return Card(
-                    color: Colors.amber[50],
-                    elevation: 4,
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: const BorderSide(
-                        color: Colors.grey,
-                        width: 2,
-                      ),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: user.avatar.isNotEmpty
-                            ? AssetImage(user.avatar)
-                            : AssetImage(
-                                avatarOptions[index % avatarOptions.length]),
-                      ),
-                      title: Text(user.name),
-                      subtitle:
-                          Text('${user.email}, ${user.phone}, ${user.address}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Confirm Deletion'),
-                                content: const Text(
-                                    'Are you sure you want to delete this user?'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      ref
-                                          .read(userListProvider.notifier)
-                                          .deleteUser(index);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              );
-                            },
+                          return UserCard(
+                            user: user,
+                            index: index,
+                            avatarOptions: Constants.avatarOptions,
+                            userBloc: userBloc,
                           );
                         },
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserEditScreen(
-                                name: user.name,
-                                address: user.address,
-                                phoneNumber: user.phone,
-                                email: user.email,
-                                avatar:
-                                    getAvatarPath(user, avatarOptions, index)),
-                          ),
-                        ).then((updatedUser) {
-                          if (updatedUser != null) {
-                            ref
-                                .read(userListProvider.notifier)
-                                .updateUser(index, updatedUser);
-                          }
-                        });
-                      },
-                    ),
-                  );
-                },
               ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.grey,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddUserScreen(),
-            ),
-          ).then((newUser) {
-            if (newUser != null) {
-              ref.read(userListProvider.notifier).addUser(newUser);
-            }
-          });
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.grey,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddUserScreen(),
+                    ),
+                  ).then((newUser) {
+                    if (newUser != null) {
+                      userBloc.add(AddingUser(newUser));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('User added successfully!'),
+                        ),
+                      );
+                    }
+                  });
+                },
+                child: const Icon(Icons.add),
+              ),
+            );
+          } else if (state is UserErrorState) {
+            return Scaffold(
+              backgroundColor: Colors.black,
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Error: ${state.error}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.red,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        userBloc.add(RetryEvent());
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          return const SizedBox();
         },
-        child: const Icon(Icons.add),
       ),
     );
   }

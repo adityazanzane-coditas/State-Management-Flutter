@@ -10,11 +10,7 @@ class UserListBloc extends Bloc<UserEvent, UserState> {
   final UserRepository userRepository;
 
   UserListBloc({required this.userRepository}) : super(UserListLoading()) {
-    on<AddingUser>(_onAddingUser);
-    on<UpdatingUser>(_onUpdatingUser);
-    on<DeletingUser>(_onDeletingUser);
-    on<RetryEvent>(_onRetryEvent);
-
+    on<UserEvent>(_eventHandler);
     _fetchUsers();
   }
 
@@ -27,6 +23,21 @@ class UserListBloc extends Bloc<UserEvent, UserState> {
     } catch (error) {
       // ignore: invalid_use_of_visible_for_testing_member
       emit(UserErrorState(error.toString()));
+    }
+  }
+
+  Future<void> _eventHandler(
+    UserEvent event,
+    Emitter<UserState> emit,
+  ) async {
+    if (event is AddingUser) {
+      await _addUser(event.newUser, emit);
+    } else if (event is UpdatingUser) {
+      await _updateUser(event.index, event.updatedUser, emit);
+    } else if (event is DeletingUser) {
+      _deleteUser(event.index, emit);
+    } else if (event is RetryEvent) {
+      _fetchUsers();
     }
   }
 
@@ -46,7 +57,10 @@ class UserListBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _updateUser(
-      int index, User updatedUser, Emitter<UserState> emit) async {
+    int index,
+    User updatedUser,
+    Emitter<UserState> emit,
+  ) async {
     try {
       await Future.delayed(const Duration(seconds: 1));
       final random = Random();
@@ -61,22 +75,18 @@ class UserListBloc extends Bloc<UserEvent, UserState> {
     }
   }
 
-  void _onAddingUser(AddingUser event, Emitter<UserState> emit) async {
-    emit(UserListLoading());
-    await _addUser(event.newUser, emit);
-  }
-
-  void _onUpdatingUser(UpdatingUser event, Emitter<UserState> emit) async {
-    emit(UserListLoading());
-    await _updateUser(event.index, event.updatedUser, emit);
-  }
-
-  void _onDeletingUser(DeletingUser event, Emitter<UserState> emit) {
-    userList.removeAt(event.index);
-    emit(UserListLoaded(List.from(userList)));
-  }
-
-  void _onRetryEvent(RetryEvent event, Emitter<UserState> emit) {
-    _fetchUsers();
+  Future<void> _deleteUser(int index, Emitter<UserState> emit) async {
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+      final random = Random();
+      if (random.nextBool()) {
+        userList.removeAt(index);
+        emit(UserListLoaded(List.from(userList)));
+      } else {
+        emit(UserErrorState('Failed to delete user. Please try again.'));
+      }
+    } catch (error) {
+      emit(UserErrorState(error.toString()));
+    }
   }
 }

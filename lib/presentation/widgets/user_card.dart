@@ -72,6 +72,12 @@ class UserCard extends StatelessWidget {
                   content: Text('User updated successfully!'),
                 ),
               );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to add user. Please try again.'),
+                ),
+              );
             }
           });
         },

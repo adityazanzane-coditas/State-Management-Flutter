@@ -80,6 +80,13 @@ class UserListScreen extends StatelessWidget {
                           content: Text('User added successfully!'),
                         ),
                       );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Failed to add user. Please try again.'),
+                        ),
+                      );
                     }
                   });
                 },

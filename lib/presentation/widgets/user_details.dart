@@ -10,6 +10,7 @@ class UserDetails extends StatelessWidget {
     required this.phoneNumber,
     required this.address,
     required this.avatar,
+    Function(User p1)? onUserAdded,
   });
 
   final String name, email, phoneNumber, address, avatar;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/user_details.dart';
+import 'package:user_app/presentation/widgets/user_details.dart';
 
-class UserEditScreen extends StatelessWidget {
-  const UserEditScreen({
+class EditUserScreen extends StatelessWidget {
+  const EditUserScreen({
     super.key,
     required this.name,
     required this.phoneNumber,

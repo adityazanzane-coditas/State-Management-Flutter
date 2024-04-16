@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import '../widgets/user_details.dart';
+import 'package:user_app/data/models/user.dart';
+import 'package:user_app/presentation/widgets/user_details.dart';
 
-class AddUserScreen extends StatefulWidget {
-  const AddUserScreen({super.key});
-
-  @override
-  _AddUserScreenState createState() => _AddUserScreenState();
-}
-
-class _AddUserScreenState extends State<AddUserScreen> {
-  final _formKey = GlobalKey<FormState>();
+class AddUserScreen extends StatelessWidget {
+  const AddUserScreen({super.key, this.onUserAdded});
+  final Function(User)? onUserAdded;
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +16,13 @@ class _AddUserScreenState extends State<AddUserScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: _formKey,
-            child: UserDetails(
-              avatar: 'assets/profile_icon.png',
-              name: '',
-              email: '',
-              phoneNumber: '',
-              address: '',
-            ),
+          child: UserDetails(
+            avatar: 'assets/profile_icon.png',
+            name: '',
+            email: '',
+            phoneNumber: '',
+            address: '',
+            onUserAdded: onUserAdded,
           ),
         ),
       ),
